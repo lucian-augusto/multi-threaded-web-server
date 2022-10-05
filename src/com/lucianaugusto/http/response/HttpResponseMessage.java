@@ -5,6 +5,7 @@ import static com.lucianaugusto.http.standards.HttpStatusCodeEnum.OK;
 
 import java.io.File;
 
+import com.lucianaugusto.base.utils.FileUtils;
 import com.lucianaugusto.base.utils.IOUtils;
 import com.lucianaugusto.config.WebServerConstants;
 import com.lucianaugusto.http.standards.HttpContentTypeEnum;
@@ -20,7 +21,7 @@ public class HttpResponseMessage {
 
     public HttpResponseMessage(File file) {
         this.statusLine = generateStatusLine(IOUtils.fileExists(file) ? OK : NOT_FOUND);
-        this.contentTypeLine = generateContentTypeLine();
+        this.contentTypeLine = generateContentTypeLine(file);
         this.body = IOUtils.fileExists(file) ? file : new File(WebServerConstants.FILE_NOT_FOUND_PATH);
     }
 
@@ -40,7 +41,8 @@ public class HttpResponseMessage {
         return "HTTP/" + WebServerConstants.HTTP_VERSION + " " + status.getStatusCode() +  " Document Follows" + CRLF;
     }
 
-    private String generateContentTypeLine() {
-        return CONTENT_TYPE_STRING + HttpContentTypeEnum.TEXT_HTML.getType() + CRLF;
+    private String generateContentTypeLine(File file) {
+        String extension = FileUtils.getFileExtension(file).get();
+        return CONTENT_TYPE_STRING + HttpContentTypeEnum.getContentTypeFromExtension(extension).getType() + CRLF;
     }
 }
